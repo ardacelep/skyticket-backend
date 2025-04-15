@@ -78,6 +78,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "owner")
     private List<Ticket> tickets;
 
+    @ManyToMany(mappedBy = "owners")
+    private List<Certificate> certificates;
+
     public String getUsername() {
         return email;
     }
