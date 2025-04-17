@@ -1,6 +1,5 @@
 package com.skylab.skyticket.core.exception;
 
-import com.skylab.skyticket.entities.ErrorMessageType;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

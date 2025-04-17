@@ -1,6 +1,5 @@
 package com.skylab.skyticket.core.exception;
 
-import com.skylab.skyticket.entities.ErrorMessageType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
