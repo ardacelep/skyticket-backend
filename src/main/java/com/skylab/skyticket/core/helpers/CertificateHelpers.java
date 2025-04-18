@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CertificateHelper {
+public class CertificateHelpers {
 
     public GetCertificateDto convertCertificateToDto(Certificate certificate, boolean includeOwners) {
 

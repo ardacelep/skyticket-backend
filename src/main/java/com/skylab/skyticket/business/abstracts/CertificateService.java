@@ -9,6 +9,6 @@ public interface CertificateService {
 
     GetCertificateDto addCertificate(AddCertificateDto addCertificateDto);
 
-    GetCertificateDto getCertificateById(UUID certificateId);
+    GetCertificateDto getCertificateById(UUID certificateId, boolean includeOwners);
 
 }

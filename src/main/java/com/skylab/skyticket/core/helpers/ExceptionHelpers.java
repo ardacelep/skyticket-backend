@@ -1,6 +1,10 @@
-package com.skylab.skyticket.core.exception;
+package com.skylab.skyticket.core.helpers;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.skylab.skyticket.core.exception.ApiError;
+import com.skylab.skyticket.core.exception.ErrorMessageType;
+import com.skylab.skyticket.core.exception.Exception;
+import com.skylab.skyticket.core.exception.RuntimeBaseException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExceptionHelpers {
 
     public <E> ApiError<E> createApiError(E message, WebRequest webRequest, HttpStatus httpStatus, ErrorMessageType errorMessageType) {
@@ -36,7 +39,7 @@ public class ExceptionHelpers {
 
         apiError.setErrorMessageType(errorMessageType);
 
-        Exception<E> exception = new Exception<>();
+        com.skylab.skyticket.core.exception.Exception<E> exception = new Exception<>();
 
         exception.setCreatedAt(LocalDateTime.now());
 
