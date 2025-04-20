@@ -7,6 +7,7 @@ import com.skylab.skyticket.core.results.BaseResponse;
 import com.skylab.skyticket.core.results.MessageType;
 import com.skylab.skyticket.entities.dtos.certificate.AddCertificateDto;
 import com.skylab.skyticket.entities.dtos.certificate.GetCertificateDto;
+import com.skylab.skyticket.entities.dtos.certificate.GiveCertificateDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,12 @@ public class CertificateController {
     public BaseResponse<GetCertificateDto> getCertificateById(@PathVariable UUID id, @RequestParam(defaultValue = "false") boolean includeOwners, WebRequest webRequest){
         GetCertificateDto responseData = certificateService.getCertificateById(id,includeOwners);
         return baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, "Certificate was successfully retrieved.", responseData, webRequest);
+    }
+
+    @PostMapping("/give")
+    public BaseResponse<GetCertificateDto> giveCertificateToUserByEmail(@RequestBody @Valid GiveCertificateDto giveCertificateDto, WebRequest webRequest){
+        GetCertificateDto responseData = certificateService.giveCertificateToUserByEmail(giveCertificateDto);
+        return baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.COMPLETED, "Certificate was successfully given to user.", responseData, webRequest);
     }
 
 }

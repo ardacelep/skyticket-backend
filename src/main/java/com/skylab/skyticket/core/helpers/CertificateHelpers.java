@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -44,7 +45,7 @@ public class CertificateHelpers {
             }
         }
         else{
-            getCertificateDto.setOwnersDto(null);
+            getCertificateDto.setOwnersDto(new ArrayList<GetUserDto>());
         }
         return getCertificateDto;
     }

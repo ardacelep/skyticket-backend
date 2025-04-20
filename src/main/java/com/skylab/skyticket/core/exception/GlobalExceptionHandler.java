@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -78,7 +79,8 @@ public class GlobalExceptionHandler {
         return list;
     }
 
-    public ResponseEntity<ApiError<Map<String, List<String>>>> prepareFieldValidationExceptionResponse(MethodArgumentNotValidException ex, WebRequest webRequest, ErrorMessageType errorMessageType) {
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError<Map<String, List<String>>>> prepareFieldValidationExceptionResponse(MethodArgumentNotValidException ex, WebRequest webRequest) {
 
         Map<String, List<String>> errorsMap = new HashMap<>();
 
@@ -95,24 +97,28 @@ public class GlobalExceptionHandler {
             }
         }
 
-        return ResponseEntity.status(ex.getStatusCode().value()).body(createApiError(errorsMap, webRequest, HttpStatus.BAD_REQUEST,errorMessageType));
+        return ResponseEntity.status(ex.getStatusCode().value()).body(createApiError(errorsMap, webRequest, HttpStatus.BAD_REQUEST,ErrorMessageType.VALIDATION_FAILED));
 
     }
 
+    @ExceptionHandler(value = RuntimeBaseException.class)
     public ResponseEntity<ApiError> prepareRunTimeBaseExceptionResponse(RuntimeBaseException exception, WebRequest webRequest){
 
         return ResponseEntity.status(exception.getHttpStatus()).body(createApiError(exception.getMessage(), webRequest, exception.getHttpStatus(), exception.getErrorMessageType()));
 
     }
 
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> prepareHttpMessageNotReadableExceptionResponse(HttpMessageNotReadableException exception, WebRequest webRequest){
         return ResponseEntity.badRequest().body(createApiError(exception.getMessage(),webRequest, HttpStatus.BAD_REQUEST, ErrorMessageType.MESSAGE_NOT_READABLE ));
     }
 
+    @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiError> prepareMethodArgumentTypeMismatchExceptionResponse(MethodArgumentTypeMismatchException exception, WebRequest webRequest){
         return ResponseEntity.badRequest().body(createApiError(exception.getMessage(),webRequest,HttpStatus.BAD_REQUEST,ErrorMessageType.MESSAGE_NOT_READABLE));
     }
 
+    @ExceptionHandler(value = MissingServletRequestParameterException.class)
     public ResponseEntity<ApiError<Map<String, List<String>>>> prepareMissingParameterExceptionResponse(
             MissingServletRequestParameterException ex, WebRequest webRequest, ErrorMessageType errorMessageType) {
 
@@ -126,6 +132,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(createApiError(errorsMap, webRequest, HttpStatus.BAD_REQUEST, errorMessageType));
     }
 
+    @ExceptionHandler(value = MissingPathVariableException.class)
     public ResponseEntity<ApiError<Map<String, List<String>>>> prepareMissingPathVariableExceptionResponse(
             MissingPathVariableException ex, WebRequest webRequest, ErrorMessageType errorMessageType) {
 
@@ -139,6 +146,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.value()).body(createApiError(errorsMap, webRequest, HttpStatus.BAD_REQUEST, errorMessageType));
     }
 
+    @ExceptionHandler(value = NoResourceFoundException.class)
     public ResponseEntity<ApiError<String>> prepareNoResourceFoundExceptionResponse(
             NoResourceFoundException ex, WebRequest webRequest, ErrorMessageType errorMessageType) {
 

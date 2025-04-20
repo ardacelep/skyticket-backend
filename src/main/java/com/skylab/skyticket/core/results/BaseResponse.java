@@ -1,6 +1,7 @@
 package com.skylab.skyticket.core.results;
 
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -31,6 +34,15 @@ public class BaseResponse<D> {
 
     private String message;
 
-    private D data;
+    private final Map<String, D> data = new HashMap<>();
 
+    @JsonAnyGetter
+    public Map<String, D> getData() {
+        return data;
+    }
+
+    // Opsiyonel: Kolay veri eklemek için
+    public void addData(String key, D value) {
+        this.data.put(key, value);
+    }
 }

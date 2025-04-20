@@ -20,18 +20,12 @@ public class BaseResponseHelpers {
         BaseResponse<D> response = new BaseResponse<>();
 
         response.setHttpStatus(httpStatus);
-
         response.setHttpStatusCode(httpStatus.value());
-
         response.setMessageType(messageType);
-
-        response.setData(data);
-
         response.setCreatedAt(LocalDateTime.now());
-
         response.setHostName(getHostName());
-
         response.setPath(webRequest.getDescription(false).substring(4));
+        response.setMessage(message);
 
         if (webRequest instanceof ServletWebRequest servletWebRequest) {
             HttpServletRequest request = servletWebRequest.getRequest();
@@ -39,10 +33,19 @@ public class BaseResponseHelpers {
             response.setRequestType(methodType);
         }
 
-        response.setMessage(message);
+        if (data != null) {
+            String dataKey = getDataKeyName(data);
+            response.addData(dataKey, data);
+        }
 
         return response;
 
+    }
+
+    // Sınıf adını küçük harfle başlatıp key olarak kullanmak için
+    private <D> String getDataKeyName(D data) {
+        String simpleName = data.getClass().getSimpleName(); // Örn: UserDto
+        return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1); // -> userDto
     }
 
     public BaseResponse<Void> createBaseResponse(HttpStatus httpStatus, MessageType messageType, String message, WebRequest webRequest) {

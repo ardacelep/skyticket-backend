@@ -9,7 +9,8 @@ import lombok.Getter;
 public enum MessageType {
 
     CREATED("CREATED", "Data was successfully created and saved to the database."),
-    FOUND("FOUND", "Data was successfully retrieved from the database."),;
+    FOUND("FOUND", "Data was successfully retrieved from the database."),
+    COMPLETED("COMPLETED", "Process was successfully completed."),;
 
 
     @JsonProperty("name")
