@@ -45,7 +45,7 @@ public class EventController {
     public ResponseEntity<BaseResponse<List<GetEventDto>>> getAllEvents(WebRequest webRequest){
 
         List<GetEventDto> responseData = eventService.getAllEvents();
-        BaseResponse<List<GetEventDto>> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, "Events were successfully retrieved.", responseData, webRequest);
+        BaseResponse<List<GetEventDto>> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, "Events were successfully retrieved.", webRequest, responseData);
         return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }
 

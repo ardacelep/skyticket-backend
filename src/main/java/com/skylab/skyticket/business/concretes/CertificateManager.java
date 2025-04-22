@@ -105,7 +105,7 @@ public class CertificateManager implements CertificateService {
             throw new RuntimeBaseException(ErrorMessageType.NO_RECORD_EXISTS, MessageFormat.format("given certificate does not exist, searched in certificates for id: {0}", giveCertificateDto.getCertificateId()), HttpStatus.NOT_FOUND);
         }
 
-        User user = (User) userResult.getData();
+        User user = userResult.getData();
 
         Certificate certificate = optionalCertificate.get();
 
@@ -130,5 +130,48 @@ public class CertificateManager implements CertificateService {
         return returnCertificate;
     }
 
+    @Override
+    public List<GetCertificateDto> getCertificatesByUserEmail(String email) {
 
+        DataResult<User> userResult = userService.getUserByEmail(email);
+
+        if (!userResult.isSuccess()) {
+            throw new RuntimeBaseException(ErrorMessageType.NO_RECORD_EXISTS, MessageFormat.format("given user does not exist, searched in users for email: {0}", email), HttpStatus.NOT_FOUND);
+        }
+
+        User user = userResult.getData();
+
+        List<Certificate> certificates = certificateDao.findByOwners_Id(user.getId());
+
+        if (certificates.isEmpty()) return new ArrayList<>();
+
+        List<GetCertificateDto> certificateDtos = new ArrayList<>();
+
+        for (Certificate certificate : certificates) {
+            GetCertificateDto certificateDto = certificateHelpers.convertCertificateToDto(certificate,false);
+            certificateDtos.add(certificateDto);
+        }
+
+        return certificateDtos;
+    }
+
+    @Override
+    public List<GetCertificateDto> getCertificatesByEventId(UUID eventId, boolean includeOwners) {
+
+        Optional<Event> optional = eventDao.findById(eventId);
+
+        if (optional.isEmpty()) throw new RuntimeBaseException(ErrorMessageType.NO_RECORD_EXISTS, MessageFormat.format("given event does not exist, searched in events for id: {0}", eventId), HttpStatus.NOT_FOUND);
+
+        List<Certificate> certificates= certificateDao.findAllByEventId(eventId);
+
+        if (certificates.isEmpty()) return new ArrayList<>();
+
+        List<GetCertificateDto> certificateDtos = new ArrayList<>();
+
+        for (Certificate certificate : certificates) {
+            GetCertificateDto certificateDto = certificateHelpers.convertCertificateToDto(certificate,includeOwners);
+            certificateDtos.add(certificateDto);
+        }
+        return certificateDtos;
+    }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class BaseResponseHelpers {
 
-    public <D> BaseResponse<D> createBaseResponse(HttpStatus httpStatus, MessageType messageType, String message,D data, WebRequest webRequest) {
+    public <D> BaseResponse<D> createBaseResponse(HttpStatus httpStatus, MessageType messageType, String message, WebRequest webRequest,D data) {
         BaseResponse<D> response = new BaseResponse<>();
 
         response.setHttpStatus(httpStatus);
@@ -44,12 +44,18 @@ public class BaseResponseHelpers {
 
     // Sınıf adını küçük harfle başlatıp key olarak kullanmak için
     private <D> String getDataKeyName(D data) {
+        // Eğer data bir koleksiyon ise (List, Set, vb.), key ismi "data" olsun
+        if (data instanceof Iterable) {
+            return "data";
+        }
+
+        // Koleksiyon değilse sınıf adını kullan
         String simpleName = data.getClass().getSimpleName(); // Örn: UserDto
         return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1); // -> userDto
     }
 
     public BaseResponse<Void> createBaseResponse(HttpStatus httpStatus, MessageType messageType, String message, WebRequest webRequest) {
-        return createBaseResponse(httpStatus, messageType, message, null, webRequest);
+        return createBaseResponse(httpStatus, messageType, message, webRequest,null);
     }
 
     public String getHostName() {

@@ -17,4 +17,8 @@ public interface CertificateService {
 
     List<GetCertificateDto> getAllCertificates(boolean includeOwners);
 
+    List<GetCertificateDto> getCertificatesByUserEmail(String email);
+
+    List<GetCertificateDto> getCertificatesByEventId(UUID eventId, boolean includeOwners);
+
 }
