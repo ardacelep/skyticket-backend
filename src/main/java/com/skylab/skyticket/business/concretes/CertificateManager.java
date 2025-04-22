@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,6 +73,23 @@ public class CertificateManager implements CertificateService {
     }
 
     @Override
+    public List<GetCertificateDto> getAllCertificates(boolean includeOwners) {
+
+        List<Certificate> certificates = certificateDao.findAll();
+
+        if (certificates.isEmpty()) return new ArrayList<>();
+
+        List<GetCertificateDto> certificateDtos = new ArrayList<>();
+
+        for (Certificate certificate : certificates) {
+            GetCertificateDto certificateDto = certificateHelpers.convertCertificateToDto(certificate,includeOwners);
+            certificateDtos.add(certificateDto);
+        }
+
+        return certificateDtos;
+    }
+
+    @Override
     @Transactional
     public GetCertificateDto giveCertificateToUserByEmail(GiveCertificateDto giveCertificateDto) {
 
@@ -110,4 +129,6 @@ public class CertificateManager implements CertificateService {
 
         return returnCertificate;
     }
+
+
 }

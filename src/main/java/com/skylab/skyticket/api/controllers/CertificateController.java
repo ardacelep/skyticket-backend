@@ -11,13 +11,15 @@ import com.skylab.skyticket.entities.dtos.certificate.GiveCertificateDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/certificate")
+@RequestMapping("/api/certificates")
 @RequiredArgsConstructor
 public class CertificateController {
 
@@ -25,21 +27,32 @@ public class CertificateController {
     private final BaseResponseHelpers baseResponseHelpers;
 
     @PostMapping("/add")
-    public BaseResponse<GetCertificateDto> addCertificate(@RequestBody @Valid AddCertificateDto addCertificateDto, WebRequest webRequest){
+    public ResponseEntity<BaseResponse<GetCertificateDto>>  addCertificate(@RequestBody @Valid AddCertificateDto addCertificateDto, WebRequest webRequest){
         GetCertificateDto responseData = certificateService.addCertificate(addCertificateDto);
-        return baseResponseHelpers.createBaseResponse(HttpStatus.CREATED, MessageType.CREATED, "Certificate was successfully saved.", responseData, webRequest);
+        BaseResponse<GetCertificateDto> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.CREATED, MessageType.CREATED, "Certificate was successfully saved.", responseData, webRequest);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }
 
-    @PostMapping("/find/{id}")
-    public BaseResponse<GetCertificateDto> getCertificateById(@PathVariable UUID id, @RequestParam(defaultValue = "false") boolean includeOwners, WebRequest webRequest){
+    @GetMapping("/find/{id}")
+    public ResponseEntity<BaseResponse<GetCertificateDto>> getCertificateById(@PathVariable UUID id, @RequestParam(defaultValue = "false") boolean includeOwners, WebRequest webRequest){
         GetCertificateDto responseData = certificateService.getCertificateById(id,includeOwners);
-        return baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, "Certificate was successfully retrieved.", responseData, webRequest);
+        BaseResponse<GetCertificateDto> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, "Certificate was successfully retrieved.", responseData, webRequest);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }
 
     @PostMapping("/give")
-    public BaseResponse<GetCertificateDto> giveCertificateToUserByEmail(@RequestBody @Valid GiveCertificateDto giveCertificateDto, WebRequest webRequest){
+    public ResponseEntity<BaseResponse<GetCertificateDto>> giveCertificateToUserByEmail(@RequestBody @Valid GiveCertificateDto giveCertificateDto, WebRequest webRequest){
         GetCertificateDto responseData = certificateService.giveCertificateToUserByEmail(giveCertificateDto);
-        return baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.COMPLETED, "Certificate was successfully given to user.", responseData, webRequest);
+        BaseResponse<GetCertificateDto> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.COMPLETED, "Certificate was successfully given to user.", responseData, webRequest);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }
+
+    @GetMapping("/list")
+    public ResponseEntity<BaseResponse<List<GetCertificateDto>>> getAllCertificates(@RequestParam(defaultValue = "false") boolean includeOwners, WebRequest webRequest){
+        List<GetCertificateDto> responseData = certificateService.getAllCertificates(includeOwners);
+        BaseResponse<List<GetCertificateDto>> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, "Certificates were successfully retrieved.", responseData, webRequest);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
+    }
+
 
 }
