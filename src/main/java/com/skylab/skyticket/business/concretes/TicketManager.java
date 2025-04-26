@@ -5,8 +5,11 @@ import com.skylab.skyticket.business.abstracts.ImageService;
 import com.skylab.skyticket.business.abstracts.TicketService;
 import com.skylab.skyticket.business.abstracts.UserService;
 import com.skylab.skyticket.business.constants.Messages;
+import com.skylab.skyticket.core.exception.ErrorMessageType;
+import com.skylab.skyticket.core.exception.RuntimeBaseException;
 import com.skylab.skyticket.core.mail.EmailService;
 import com.skylab.skyticket.core.results.*;
+import com.skylab.skyticket.core.utilities.ReflectionUtils;
 import com.skylab.skyticket.dataAccess.TicketDao;
 import com.skylab.skyticket.entities.Option;
 import com.skylab.skyticket.entities.Role;
@@ -18,11 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class TicketManager implements TicketService {
@@ -301,4 +302,43 @@ public class TicketManager implements TicketService {
 
         return new SuccessDataResult<GetTicketDto>(getTicketDto, Messages.ticketFound, HttpStatus.OK);
     }
+
+    @Override
+    public List<GetTicketDto> getAllTicketsByUserEmail(String email){
+        DataResult<User> userResult = userService.getUserByEmail(email);
+
+        if (!userResult.isSuccess()) {
+            throw new RuntimeBaseException(ErrorMessageType.NO_RECORD_EXISTS, MessageFormat.format("given user does not exist, searched in users for email: {0}", email), HttpStatus.NOT_FOUND);
+        }
+        User user = userResult.getData();
+
+        List<Ticket> tickets = ticketDao.findAllByOwnerId(user.getId());
+
+        if (tickets.isEmpty()) return new ArrayList<>();
+
+        List<GetTicketDto> ticketDtos = new ArrayList<>();
+
+        for (Ticket ticket : tickets) {
+            GetTicketDto ticketDto = new GetTicketDto();
+            ReflectionUtils.copyNonNullProperties(ticket, ticketDto);
+            ticketDto.setUsed(ticket.isUsed());
+
+            GetUserDto userDto = new GetUserDto();
+            ReflectionUtils.copyNonNullProperties(ticket.getOwner(), userDto);
+
+            ticketDto.setOwner(userDto);
+
+            GetEventDto eventDto = new GetEventDto();
+            ReflectionUtils.copyNonNullProperties(ticket.getEvent(), eventDto);
+
+            ticketDto.setEvent(eventDto);
+
+            ticketDtos.add(ticketDto);
+
+        }
+
+        return ticketDtos;
+
+    }
+
 }
