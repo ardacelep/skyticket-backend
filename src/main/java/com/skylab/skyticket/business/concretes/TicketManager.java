@@ -16,6 +16,7 @@ import com.skylab.skyticket.entities.Role;
 import com.skylab.skyticket.entities.Ticket;
 import com.skylab.skyticket.entities.User;
 import com.skylab.skyticket.entities.dtos.ticket.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -320,16 +321,16 @@ public class TicketManager implements TicketService {
 
         for (Ticket ticket : tickets) {
             GetTicketDto ticketDto = new GetTicketDto();
-            ReflectionUtils.copyNonNullProperties(ticket, ticketDto);
+            BeanUtils.copyProperties(ticket, ticketDto);
             ticketDto.setUsed(ticket.isUsed());
 
             GetUserDto userDto = new GetUserDto();
-            ReflectionUtils.copyNonNullProperties(ticket.getOwner(), userDto);
+            BeanUtils.copyProperties(ticket.getOwner(), userDto);
 
             ticketDto.setOwner(userDto);
 
             GetEventDto eventDto = new GetEventDto();
-            ReflectionUtils.copyNonNullProperties(ticket.getEvent(), eventDto);
+            BeanUtils.copyProperties(ticket.getEvent(), eventDto);
 
             ticketDto.setEvent(eventDto);
 

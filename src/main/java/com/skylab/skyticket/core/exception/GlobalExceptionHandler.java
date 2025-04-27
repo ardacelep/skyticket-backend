@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
             }
         }
 
-        return ResponseEntity.status(ex.getStatusCode().value()).body(createApiError(errorsMap, webRequest, HttpStatus.BAD_REQUEST,ErrorMessageType.VALIDATION_FAILED));
+        return ResponseEntity.status(ex.getStatusCode().value()).body(createApiError(errorsMap, webRequest, HttpStatus.UNPROCESSABLE_ENTITY,ErrorMessageType.VALIDATION_FAILED));
 
     }
 
