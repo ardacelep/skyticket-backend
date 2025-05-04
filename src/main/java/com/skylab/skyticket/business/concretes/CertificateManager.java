@@ -5,7 +5,9 @@ import com.skylab.skyticket.business.abstracts.UserService;
 import com.skylab.skyticket.core.exception.ErrorMessageType;
 import com.skylab.skyticket.core.exception.RuntimeBaseException;
 import com.skylab.skyticket.core.helpers.CertificateHelpers;
+import com.skylab.skyticket.core.mail.EmailService;
 import com.skylab.skyticket.core.results.DataResult;
+import com.skylab.skyticket.core.security.JwtService;
 import com.skylab.skyticket.core.utilities.ReflectionUtils;
 import com.skylab.skyticket.dataAccess.CertificateDao;
 import com.skylab.skyticket.dataAccess.EventDao;
@@ -18,6 +20,7 @@ import com.skylab.skyticket.entities.dtos.certificate.GetCertificateDto;
 import com.skylab.skyticket.entities.dtos.certificate.GiveCertificateDto;
 import com.skylab.skyticket.entities.dtos.ticket.GetUserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,8 @@ public class CertificateManager implements CertificateService {
     private final EventDao eventDao;
     private final UserService userService;
     private final UserDao userDao;
+    private final JwtService jwtService;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -173,5 +178,39 @@ public class CertificateManager implements CertificateService {
             certificateDtos.add(certificateDto);
         }
         return certificateDtos;
+    }
+
+    @Override
+    public GetUserDto sendCheckCertificatesAndTicketsMailToUser(String email) {
+
+        DataResult<User> userResult = userService.getUserByEmail(email);
+
+        if (!userResult.isSuccess()) {
+            throw new RuntimeBaseException(ErrorMessageType.NO_RECORD_EXISTS, MessageFormat.format("given user does not exist, searched in users for email: {0}", email), HttpStatus.NOT_FOUND);
+        }
+
+        User user = userResult.getData();
+
+        String token = jwtService.generateToken(user.getEmail(), user.getAuthorities());
+
+        String body= "<body style=\"margin:10px;padding:0 20px;font-family:Arial,sans-serif;background-color:#f8f8f8\">\n" +
+                "<div style=\"padding:0 20px;border:2px solid #000;box-shadow:8px 8px 0 rgba(0,0,0,.75);background-color:#fff\">\n" +
+                "<h1>Sertifika ve Bilet Sorgulama Bağlantısı</h1>\n" +
+                "<p>Aşağıdaki butona tıklayarak Sky Lab'in etkinliklerinden edinmiş olduğunuz bilet ve sertifikalara ulaşabilirsiniz.</p>\n" +
+                "<a href=\"https://TEMPORARYURL.com/check?token="+token+"\" target=_blank style=\"display:inline-block;background-color:#fd4509;color:#fff;text-decoration:none;font-size:16px;margin-bottom:6px;padding:15px 30px;border:2px solid #000;box-shadow:8px 8px 0 rgba(0,0,0,.75)\">Katılmak için Tıkla</a>\n" +
+                "<p style=font-size:12px>Buton çalışmıyor ise bu <a href=\"https://TEMPORARYURL.com/check?token="+token+"\">link</a> üzerinden katılabilirsiniz. <br>Unutmayınız, link kişiye özeldir. <b>Kimse ile paylaşmayınız.<b></b></p>\n" +
+                "</div>\n" +
+                "</body>";
+
+        var mailResult = emailService.sendMail(user.getEmail(), "Sky Lab Sertifika ve Bilet Sorgulama Bağlantısı", body);
+
+        if (!mailResult.isSuccess()) {
+            throw new RuntimeBaseException(ErrorMessageType.MAIL_ERROR, MessageFormat.format("an error occurred while sending mail to: {0}", user.getEmail()), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
+        GetUserDto returnUser = new GetUserDto();
+        BeanUtils.copyProperties(user,returnUser);
+
+        return returnUser;
     }
 }

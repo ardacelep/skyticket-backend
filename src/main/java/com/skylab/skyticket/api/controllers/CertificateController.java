@@ -8,6 +8,7 @@ import com.skylab.skyticket.core.results.MessageType;
 import com.skylab.skyticket.entities.dtos.certificate.AddCertificateDto;
 import com.skylab.skyticket.entities.dtos.certificate.GetCertificateDto;
 import com.skylab.skyticket.entities.dtos.certificate.GiveCertificateDto;
+import com.skylab.skyticket.entities.dtos.ticket.GetUserDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -66,6 +67,13 @@ public class CertificateController {
     public ResponseEntity<BaseResponse<List<GetCertificateDto>>> getCertificatesByEventId(@PathVariable UUID eventId, @RequestParam(defaultValue = "false") boolean includeOwners, WebRequest webRequest){
         List<GetCertificateDto> responseData = certificateService.getCertificatesByEventId(eventId,includeOwners);
         BaseResponse<List<GetCertificateDto>> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, MessageFormat.format("Certificates were successfully retrieved for event with the id: {0}",eventId), webRequest, responseData);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
+    }
+
+    @GetMapping("send/{email}")
+    public ResponseEntity<BaseResponse<GetUserDto>> sendCheckCertificatesAndTicketsMailToUser(@PathVariable String email, WebRequest webRequest){
+        GetUserDto responseData = certificateService.sendCheckCertificatesAndTicketsMailToUser(email);
+        BaseResponse<GetUserDto> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.COMPLETED, MessageFormat.format("Mail was successfully sent to user with the email: {0}",email), webRequest, responseData);
         return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }
 

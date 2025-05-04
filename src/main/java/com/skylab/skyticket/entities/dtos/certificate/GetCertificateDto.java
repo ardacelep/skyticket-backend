@@ -3,7 +3,6 @@ package com.skylab.skyticket.entities.dtos.certificate;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.skylab.skyticket.entities.dtos.ticket.GetEventDto;
 import com.skylab.skyticket.entities.dtos.ticket.GetUserDto;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

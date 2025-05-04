@@ -17,7 +17,8 @@ public enum ErrorMessageType {
     ALREADY_ACTIVE("ALREADY_ACTIVE","This instance is already active."),
     MISSING_PATH_VARIABLE("MISSING_PATH_VARIABLE","There is a missing path variable."),
     MISSING_REQUEST_PARAM("MISSING_REQUEST_PARAM","There is a missing request parameter."),
-    RESOURCE_NOT_FOUND("RESOURCE_NOT_FOUND","There is no such endpoint.");
+    RESOURCE_NOT_FOUND("RESOURCE_NOT_FOUND","There is no such endpoint."),
+    MAIL_ERROR("MAIL_ERROR","An error occurred while sending the email."),;
 
 
 
