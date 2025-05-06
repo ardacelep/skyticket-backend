@@ -51,9 +51,9 @@ public class TicketsController {
         return ResponseEntity.status(result.getHttpStatus()).body(result);
     }
 
-    @GetMapping("/getTicketsByUserEmail/{email}")
-    public ResponseEntity<BaseResponse<List<GetTicketDto>>> getTicketsByUserEmail(@PathVariable String email, WebRequest webRequest){
-        List<GetTicketDto> responseData = ticketService.getAllTicketsByUserEmail(email);
+    @GetMapping("/getTicketsByUserEmail")
+    public ResponseEntity<BaseResponse<List<GetTicketDto>>> getTicketsByUserEmail(@RequestParam String email, WebRequest webRequest){
+        List<GetTicketDto> responseData = ticketService.getTicketsByUserEmail(email);
         BaseResponse<List<GetTicketDto>> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, MessageFormat.format("Tickets were successfully retrieved for user with the email: {0}",email), webRequest, responseData);
         return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }

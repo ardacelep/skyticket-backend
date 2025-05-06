@@ -1,6 +1,7 @@
 package com.skylab.skyticket.business.concretes;
 
 import com.skylab.skyticket.business.abstracts.CertificateService;
+import com.skylab.skyticket.business.abstracts.TicketService;
 import com.skylab.skyticket.business.abstracts.UserService;
 import com.skylab.skyticket.core.exception.ErrorMessageType;
 import com.skylab.skyticket.core.exception.RuntimeBaseException;
@@ -15,10 +16,9 @@ import com.skylab.skyticket.dataAccess.UserDao;
 import com.skylab.skyticket.entities.Certificate;
 import com.skylab.skyticket.entities.Event;
 import com.skylab.skyticket.entities.User;
-import com.skylab.skyticket.entities.dtos.certificate.AddCertificateDto;
-import com.skylab.skyticket.entities.dtos.certificate.GetCertificateDto;
-import com.skylab.skyticket.entities.dtos.certificate.GiveCertificateDto;
+import com.skylab.skyticket.entities.dtos.certificate.*;
 import com.skylab.skyticket.entities.dtos.ticket.GetUserDto;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +40,7 @@ public class CertificateManager implements CertificateService {
     private final UserDao userDao;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final TicketService ticketService;
 
     @Override
     @Transactional
@@ -213,4 +211,102 @@ public class CertificateManager implements CertificateService {
 
         return returnUser;
     }
+
+    @Override
+    public CheckCertificatesAndTicketsDto checkCertificatesAndTicketsByToken(String token) {
+
+        try {
+            jwtService.extractUser(token);
+        }
+        catch (SignatureException e){
+            throw new RuntimeBaseException(ErrorMessageType.INVALID_TOKEN, MessageFormat.format("signature for token is not valid: {0}", token), HttpStatus.UNAUTHORIZED);
+        }
+
+        String userEmail = jwtService.extractUser(token);
+        Date tokenExp = jwtService.extractExpiration(token);
+
+        if (tokenExp.before(new Date())){
+            throw new RuntimeBaseException(ErrorMessageType.EXPIRED_TOKEN, MessageFormat.format("token is expired: {0}", token), HttpStatus.UNAUTHORIZED);
+        }
+
+        CheckCertificatesAndTicketsDto checkCertificatesAndTicketsDto = new CheckCertificatesAndTicketsDto();
+
+        checkCertificatesAndTicketsDto.setGetCertificateDtoList(getCertificatesByUserEmail(userEmail));
+
+        checkCertificatesAndTicketsDto.setGetTicketDtoList(ticketService.getTicketsByUserEmail(userEmail));
+
+        return checkCertificatesAndTicketsDto;
+
+    }
+
+    @Override
+    public List<GetCertificateDto> searchCertificatesByNameOrDescription(String keyword, boolean includeOwners) {
+
+        List<Certificate> certificates = new ArrayList<>(certificateDao.searchByNameOrDescription(keyword));
+
+        if (certificates.isEmpty()) return new ArrayList<>();
+
+        List<GetCertificateDto> certificateDtos = new ArrayList<>();
+
+        for (Certificate certificate : certificates) {
+            GetCertificateDto certificateDto = certificateHelpers.convertCertificateToDto(certificate,includeOwners);
+            certificateDtos.add(certificateDto);
+        }
+
+        return certificateDtos;
+
+    }
+
+    @Override
+    @Transactional
+    public GetCertificateDto updateCertificate(UUID certificateId, UpdateCertificateDto updateCertificateDto) {
+
+        Optional<Certificate> optional = certificateDao.findById(certificateId);
+
+        if (optional.isEmpty()) throw new RuntimeBaseException(ErrorMessageType.NO_RECORD_EXISTS, MessageFormat.format("given certificate does not exist, searched in certificates for id: {0}", certificateId), HttpStatus.NOT_FOUND);
+
+        Certificate certificate = optional.get();
+
+        if (updateCertificateDto.getEventId() != null && !updateCertificateDto.getEventId().equals(certificate.getEvent().getId())){
+            Optional<Event> optionalEvent = eventDao.findById(updateCertificateDto.getEventId());
+
+            if (optionalEvent.isEmpty()) throw new RuntimeBaseException(ErrorMessageType.NO_RECORD_EXISTS, MessageFormat.format("given event does not exist, searched in events for id: {0}", updateCertificateDto.getEventId()), HttpStatus.NOT_FOUND);
+
+            Event event = optionalEvent.get();
+
+            certificate.setEvent(event);
+
+            event.getCertificates().remove(certificate);
+
+            eventDao.save(event);
+        }
+
+        ReflectionUtils.copyNonNullProperties(updateCertificateDto,certificate);
+
+        certificateDao.save(certificate);
+
+        return certificateHelpers.convertCertificateToDto(certificate,false);
+    }
+
+    @Override
+    @Transactional
+    public GetCertificateDto deleteCertificate(UUID certificateId) {
+        Optional<Certificate> optional = certificateDao.findById(certificateId);
+
+        if (optional.isEmpty()) throw new RuntimeBaseException(ErrorMessageType.NO_RECORD_EXISTS, MessageFormat.format("given certificate does not exist, searched in certificates for id: {0}", certificateId), HttpStatus.NOT_FOUND);
+
+        Certificate certificate = optional.get();
+
+        Event event = certificate.getEvent();
+
+        event.getCertificates().remove(certificate);
+
+        eventDao.save(event);
+
+        certificateDao.delete(certificate);
+
+        return certificateHelpers.convertCertificateToDto(certificate,false);
+    }
+
+
 }

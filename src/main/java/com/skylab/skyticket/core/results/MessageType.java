@@ -10,7 +10,9 @@ public enum MessageType {
 
     CREATED("CREATED", "Data was successfully created and saved to the database."),
     FOUND("FOUND", "Data was successfully retrieved from the database."),
-    COMPLETED("COMPLETED", "Process was successfully completed."),;
+    COMPLETED("COMPLETED", "Process was successfully completed."),
+    UPDATED("UPDATED", "Data was successfully updated in the database."),
+    DELETED("DELETED", "Data was successfully deleted from the database."),;
 
 
     @JsonProperty("name")

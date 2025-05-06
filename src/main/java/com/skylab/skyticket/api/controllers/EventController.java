@@ -49,5 +49,13 @@ public class EventController {
         return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<BaseResponse<List<GetEventDto>>> searchEventsByNameOrDescription(@RequestParam String keyword, WebRequest webRequest){
+
+        List<GetEventDto> responseData = eventService.searchEventsByNameOrDescription(keyword);
+        BaseResponse<List<GetEventDto>> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, "Events were successfully retrieved.", webRequest, responseData);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
+    }
+
 
 }

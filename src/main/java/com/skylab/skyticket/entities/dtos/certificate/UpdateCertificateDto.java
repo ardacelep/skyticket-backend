@@ -16,28 +16,22 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddCertificateDto {
+public class UpdateCertificateDto {
 
-    @NotBlank(message = "name can not be empty.")
     private String name;
 
     private String description;
 
-    @NotNull(message = "certificate must be for an event. eventId can not be empty.")
     private UUID eventId;
 
     @PastOrPresent(message = "createdAt must be in the past or present.")
-    @NotNull
     private LocalDateTime createdAt;
 
-    @NotBlank(message = "storedLink can not be empty.")
     private String storedLink;
 
-    @NotNull(message = "nameboxCenterX can not be empty")
     @DecimalMin(value = "0.00", inclusive = true, message = "nameboxCenterX must be equal to or higher than 0.00 .")
     private Integer nameboxCenterX;
 
-    @NotNull(message = "nameboxCenterY can not be empty")
     @DecimalMin(value = "0.00", inclusive = true, message = "nameboxCenterY must be equal to or higher than 0.00 .")
     private Integer nameboxCenterY;
 

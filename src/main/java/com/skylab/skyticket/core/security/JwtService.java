@@ -33,7 +33,7 @@ public class JwtService {
         Date expirationDate = extractExpiration(token);
         return userDetails.getUsername().equals(email) && !expirationDate.before(new Date());
     }
-    private Date extractExpiration(String token) {
+    public Date extractExpiration(String token) {
         Claims claims = Jwts
                 .parser()
                 .verifyWith(getSignKey())

@@ -5,9 +5,7 @@ import com.skylab.skyticket.business.abstracts.CertificateService;
 import com.skylab.skyticket.core.helpers.BaseResponseHelpers;
 import com.skylab.skyticket.core.results.BaseResponse;
 import com.skylab.skyticket.core.results.MessageType;
-import com.skylab.skyticket.entities.dtos.certificate.AddCertificateDto;
-import com.skylab.skyticket.entities.dtos.certificate.GetCertificateDto;
-import com.skylab.skyticket.entities.dtos.certificate.GiveCertificateDto;
+import com.skylab.skyticket.entities.dtos.certificate.*;
 import com.skylab.skyticket.entities.dtos.ticket.GetUserDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,8 +54,8 @@ public class CertificateController {
         return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }
 
-    @GetMapping("/user/{email}")
-    public ResponseEntity<BaseResponse<List<GetCertificateDto>>> getCertificatesByUserEmail(@PathVariable String email, WebRequest webRequest){
+    @GetMapping("/user")
+    public ResponseEntity<BaseResponse<List<GetCertificateDto>>> getCertificatesByUserEmail(@RequestParam String email, WebRequest webRequest){
         List<GetCertificateDto> responseData = certificateService.getCertificatesByUserEmail(email);
         BaseResponse<List<GetCertificateDto>> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, MessageFormat.format("Certificates were successfully retrieved for user with the email: {0}",email), webRequest, responseData);
         return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
@@ -70,12 +68,39 @@ public class CertificateController {
         return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }
 
-    @GetMapping("send/{email}")
-    public ResponseEntity<BaseResponse<GetUserDto>> sendCheckCertificatesAndTicketsMailToUser(@PathVariable String email, WebRequest webRequest){
+    @GetMapping("/send")
+    public ResponseEntity<BaseResponse<GetUserDto>> sendCheckCertificatesAndTicketsMailToUser(@RequestParam String email, WebRequest webRequest){
         GetUserDto responseData = certificateService.sendCheckCertificatesAndTicketsMailToUser(email);
         BaseResponse<GetUserDto> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.COMPLETED, MessageFormat.format("Mail was successfully sent to user with the email: {0}",email), webRequest, responseData);
         return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
     }
 
+    @GetMapping("/check")
+    public ResponseEntity<BaseResponse<CheckCertificatesAndTicketsDto>> checkCertificatesAndTickets(@RequestParam String token, WebRequest webRequest){
+        CheckCertificatesAndTicketsDto responseData = certificateService.checkCertificatesAndTicketsByToken(token);
+        BaseResponse<CheckCertificatesAndTicketsDto> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.COMPLETED, "Certificates and tickets were successfully retrieved.", webRequest, responseData);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<BaseResponse<List<GetCertificateDto>>> searchCertificatesByNameOrDescription(@RequestParam String keyword, @RequestParam(defaultValue = "false") boolean includeOwners, WebRequest webRequest){
+        List<GetCertificateDto> responseData = certificateService.searchCertificatesByNameOrDescription(keyword,includeOwners);
+        BaseResponse<List<GetCertificateDto>> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.FOUND, "Certificates were successfully retrieved.", webRequest, responseData);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
+    }
+
+    @PatchMapping("/update/{id}")
+    public ResponseEntity<BaseResponse<GetCertificateDto>> updateCertificate(@PathVariable UUID id, @RequestBody @Valid UpdateCertificateDto updateCertificateDto, WebRequest webRequest){
+        GetCertificateDto responseData = certificateService.updateCertificate(id,updateCertificateDto);
+        BaseResponse<GetCertificateDto> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.UPDATED, MessageFormat.format("Certificate with the id: {0} was successfully updated.",id), webRequest, responseData);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<BaseResponse<GetCertificateDto>> deleteCertificate(@PathVariable UUID id, WebRequest webRequest){
+        GetCertificateDto responseData = certificateService.deleteCertificate(id);
+        BaseResponse<GetCertificateDto> responseBody = baseResponseHelpers.createBaseResponse(HttpStatus.OK, MessageType.DELETED, MessageFormat.format("Certificate with the id: {0} was successfully deleted.",id), webRequest, responseData);
+        return ResponseEntity.status(responseBody.getHttpStatus()).body(responseBody);
+    }
 
 }

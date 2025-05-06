@@ -305,7 +305,7 @@ public class TicketManager implements TicketService {
     }
 
     @Override
-    public List<GetTicketDto> getAllTicketsByUserEmail(String email){
+    public List<GetTicketDto> getTicketsByUserEmail(String email){
         DataResult<User> userResult = userService.getUserByEmail(email);
 
         if (!userResult.isSuccess()) {
@@ -335,11 +335,7 @@ public class TicketManager implements TicketService {
             ticketDto.setEvent(eventDto);
 
             ticketDtos.add(ticketDto);
-
         }
-
         return ticketDtos;
-
     }
-
 }

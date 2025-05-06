@@ -18,7 +18,9 @@ public enum ErrorMessageType {
     MISSING_PATH_VARIABLE("MISSING_PATH_VARIABLE","There is a missing path variable."),
     MISSING_REQUEST_PARAM("MISSING_REQUEST_PARAM","There is a missing request parameter."),
     RESOURCE_NOT_FOUND("RESOURCE_NOT_FOUND","There is no such endpoint."),
-    MAIL_ERROR("MAIL_ERROR","An error occurred while sending the email."),;
+    MAIL_ERROR("MAIL_ERROR","An error occurred while sending the email."),
+    INVALID_TOKEN("INVALID_TOKEN","The token is not valid."),
+    EXPIRED_TOKEN("EXPIRED_TOKEN","The token is expired."),;
 
 
 

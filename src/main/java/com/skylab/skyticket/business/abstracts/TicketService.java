@@ -5,9 +5,7 @@ import com.skylab.skyticket.core.results.Result;
 import com.skylab.skyticket.entities.Ticket;
 import com.skylab.skyticket.entities.dtos.ticket.AddTicketDto;
 import com.skylab.skyticket.entities.dtos.ticket.GetTicketDto;
-import com.skylab.skyticket.entities.dtos.ticket.SubmitTicketDto;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +19,7 @@ public interface TicketService {
 
     DataResult<GetTicketDto> getTicketById(UUID ticket);
 
-    List<GetTicketDto> getAllTicketsByUserEmail(String email);
+    List<GetTicketDto> getTicketsByUserEmail(String email);
 
 
 }

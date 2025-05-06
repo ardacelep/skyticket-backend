@@ -1,8 +1,6 @@
 package com.skylab.skyticket.business.abstracts;
 
-import com.skylab.skyticket.entities.dtos.certificate.AddCertificateDto;
-import com.skylab.skyticket.entities.dtos.certificate.GetCertificateDto;
-import com.skylab.skyticket.entities.dtos.certificate.GiveCertificateDto;
+import com.skylab.skyticket.entities.dtos.certificate.*;
 import com.skylab.skyticket.entities.dtos.ticket.GetUserDto;
 
 import java.util.List;
@@ -23,5 +21,13 @@ public interface CertificateService {
     List<GetCertificateDto> getCertificatesByEventId(UUID eventId, boolean includeOwners);
 
     GetUserDto sendCheckCertificatesAndTicketsMailToUser(String email);
+
+    CheckCertificatesAndTicketsDto checkCertificatesAndTicketsByToken(String token);
+
+    List<GetCertificateDto> searchCertificatesByNameOrDescription(String query, boolean includeOwners);
+
+    GetCertificateDto updateCertificate(UUID certificateId, UpdateCertificateDto updateCertificateDto);
+
+    GetCertificateDto deleteCertificate(UUID certificateId);
 
 }

@@ -17,6 +17,7 @@ public interface EventService {
 
     List<GetEventDto> getAllEvents();
 
+    public List<GetEventDto> searchEventsByNameOrDescription(String keyword);
 
 
 }

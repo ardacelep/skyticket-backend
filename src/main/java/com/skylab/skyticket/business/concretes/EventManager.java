@@ -8,6 +8,7 @@ import com.skylab.skyticket.core.utilities.ReflectionUtils;
 import com.skylab.skyticket.dataAccess.EventDao;
 import com.skylab.skyticket.entities.Event;
 import com.skylab.skyticket.entities.dtos.ticket.GetEventDto;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -69,6 +70,21 @@ public class EventManager implements EventService {
         for (Event event : events) {
             GetEventDto eventDto = new GetEventDto();
             ReflectionUtils.copyNonNullProperties(event,eventDto);
+            eventDtos.add(eventDto);
+        }
+        return eventDtos;
+    }
+
+    public List<GetEventDto> searchEventsByNameOrDescription(String keyword) {
+        List<Event> events = new ArrayList<>(eventDao.searchByNameOrDescription(keyword));
+
+        if (events.isEmpty()) return new ArrayList<>();
+
+        List<GetEventDto> eventDtos = new ArrayList<>();
+
+        for (Event event : events) {
+            GetEventDto eventDto = new GetEventDto();
+            BeanUtils.copyProperties(event,eventDto);
             eventDtos.add(eventDto);
         }
         return eventDtos;

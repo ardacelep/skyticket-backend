@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CheckCertificatesAndTicketsDto {
 
-    List<GetCertificateDto> getCertificateDtoList;
-    List<GetTicketDto> getTicketDtoList;
+    List<GetCertificateDto> getCertificateDtoList = new ArrayList<>();
+    List<GetTicketDto> getTicketDtoList = new ArrayList<>();
 
 }
