@@ -4,11 +4,15 @@ import com.skylab.skyticket.business.abstracts.EventService;
 import com.skylab.skyticket.business.abstracts.UserService;
 import com.skylab.skyticket.business.constants.Messages;
 import com.skylab.skyticket.core.results.*;
+import com.skylab.skyticket.core.utilities.ReflectionUtils;
 import com.skylab.skyticket.dataAccess.EventDao;
 import com.skylab.skyticket.entities.Event;
+import com.skylab.skyticket.entities.dtos.ticket.GetEventDto;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,5 +58,37 @@ public class EventManager implements EventService {
 
         return new SuccessDataResult<>(event.get(), Messages.eventFound, HttpStatus.OK);
     }
+
+    @Override
+    public List<GetEventDto> getAllEvents() {
+        List<Event> events = eventDao.findAll();
+
+        if (events.isEmpty()) return new ArrayList<>();
+
+        List<GetEventDto> eventDtos = new ArrayList<>();
+
+        for (Event event : events) {
+            GetEventDto eventDto = new GetEventDto();
+            ReflectionUtils.copyNonNullProperties(event,eventDto);
+            eventDtos.add(eventDto);
+        }
+        return eventDtos;
+    }
+
+    public List<GetEventDto> searchEventsByNameOrDescription(String keyword) {
+        List<Event> events = new ArrayList<>(eventDao.searchByNameOrDescription(keyword));
+
+        if (events.isEmpty()) return new ArrayList<>();
+
+        List<GetEventDto> eventDtos = new ArrayList<>();
+
+        for (Event event : events) {
+            GetEventDto eventDto = new GetEventDto();
+            BeanUtils.copyProperties(event,eventDto);
+            eventDtos.add(eventDto);
+        }
+        return eventDtos;
+    }
+
 
 }

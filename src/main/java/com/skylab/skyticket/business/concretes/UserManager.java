@@ -37,7 +37,7 @@ public class UserManager implements UserService {
     public DataResult<User> getUserById(String userId) {
         var result = userDao.findById(UUID.fromString(userId));
 
-        if (!result.isPresent() ){
+        if (result.isEmpty()){
             return new ErrorDataResult<>(Messages.userNotFound, HttpStatus.NOT_FOUND);
         }
 

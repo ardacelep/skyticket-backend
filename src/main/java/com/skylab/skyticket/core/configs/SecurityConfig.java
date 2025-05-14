@@ -49,7 +49,8 @@ public class SecurityConfig {
 
                                 // Event endpoints
                                 .requestMatchers("/api/events/addEvent").hasAnyRole("ADMIN")
-                                .requestMatchers("/api/events/getEventById/**").hasAnyRole("ADMIN")
+                                .requestMatchers("/api/events/getEventById/**", "/api/events/list", "/api/events/search")
+                                .hasAnyRole("ADMIN")
 
                                 // Event day endpoints
                                 .requestMatchers("/api/event-days/addEventDay/**").hasAnyRole("ADMIN")
@@ -63,11 +64,16 @@ public class SecurityConfig {
                                 .requestMatchers("/api/tickets/addTicket").permitAll()
                                 .requestMatchers("/api/tickets/getTicketById/**").permitAll()
                                 .requestMatchers("/api/tickets/submitTicket/**").permitAll()
+                                .requestMatchers("/api/tickets/getTicketsByUserEmail/**").hasAnyRole("ADMIN")
 
                                 // User endpoints
                                 .requestMatchers("/api/users/getUserById/**").hasAnyRole("ADMIN")
                                 .requestMatchers("/api/users/getUserByEmail/**").hasAnyRole("ADMIN")
                                 .requestMatchers("/api/users/getUserByPhoneNumber/**").hasAnyRole("ADMIN")
+
+                                // Certificate endpoints
+                                .requestMatchers("/api/certificates/send", "/api/certificates/check").permitAll()
+                                .requestMatchers("/api/certificates/**").hasAnyRole("ADMIN")
 
                                 .anyRequest().authenticated()
 
